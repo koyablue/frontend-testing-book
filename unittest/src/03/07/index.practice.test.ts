@@ -2,7 +2,7 @@ import { timeout, wait } from ".";
 
 describe("非同期処理のテスト", () => {
   test("resolve", async () => {
-    expect(await wait(50)).toBe(50);
+    expect(wait(50)).resolves.toBe(50);
   });
 
   test("reject", async () => {
