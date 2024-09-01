@@ -2,7 +2,7 @@ import { mockUploadImage } from "@/services/client/UploadImage/__mock__/jest";
 import { selectImageFile } from "@/tests/jest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { PostForm } from "./PostForm";
+import { PostForm } from ".";
 
 const user = userEvent.setup();
 
