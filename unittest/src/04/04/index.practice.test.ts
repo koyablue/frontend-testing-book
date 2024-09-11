@@ -4,42 +4,46 @@ import { getMyArticlesData, httpError } from "../fetchers/fixtures";
 
 jest.mock("../fetchers");
 
+const mockGetMyArticles = (ok = true) => {
+  const spy = jest.spyOn(Fetchers, "getMyArticles");
+  return ok
+    ? spy.mockResolvedValueOnce(getMyArticlesData)
+    : spy.mockRejectedValueOnce(httpError);
+};
+
 describe("getMyArticleLinksByCategory", () => {
-  test("指定したタグを持つ記事が1件もない場合nullが返る", async () => {
-    jest
-      .spyOn(Fetchers, "getMyArticles")
-      .mockResolvedValueOnce(getMyArticlesData);
+  describe("データ取得成功", () => {
+    test("記事がない場合nullが返される", async () => {
+      mockGetMyArticles();
+      await expect(getMyArticleLinksByCategory("Python")).resolves.toBe(null);
+    });
 
-    const res = await getMyArticleLinksByCategory("python");
-    expect(res).toBeNull();
+    test("記事がある場合titleとlinkのオブジェクトを持つ配列が返される", async () => {
+      mockGetMyArticles();
+
+      const category = "testing";
+      const articles = await getMyArticleLinksByCategory(category);
+      const data = getMyArticlesData.articles
+        .filter((article) => article.tags.includes(category))
+        .map((article) => ({
+          title: article.title,
+          link: `/articles/${article.id}`,
+        }));
+
+      expect(articles).toEqual(data);
+    });
   });
 
-  test("指定したタグを持つ記事が1件以上ある場合リンク一覽が返る", async () => {
-    jest
-      .spyOn(Fetchers, "getMyArticles")
-      .mockResolvedValueOnce(getMyArticlesData);
+  describe("データ取得失敗", () => {
+    test("エラーのデータがthrowされる", async () => {
+      mockGetMyArticles(false);
+      expect.assertions(1);
 
-    const res = await getMyArticleLinksByCategory("testing");
-    expect(res).toMatchObject([
-      {
-        title: "TypeScript を使ったテストの書き方",
-        link: "/articles/howto-testing-with-typescript",
-      },
-      {
-        title: "Jest ではじめる React のコンポーネントテスト",
-        link: "/articles/react-component-testing-with-jest",
-      },
-    ]);
-  });
-
-  test("データ取得に失敗した場合例外がthrowされる", async () => {
-    jest.spyOn(Fetchers, "getMyArticles").mockRejectedValueOnce(httpError);
-
-    expect.assertions(1);
-    try {
-      await getMyArticleLinksByCategory("testing");
-    } catch (err) {
-      expect(err).toBe(httpError);
-    }
+      try {
+        await getMyArticleLinksByCategory("testing");
+      } catch (err) {
+        expect(err).toBe(httpError);
+      }
+    });
   });
 });
