@@ -5,11 +5,12 @@ jest.mock("./greet.ts", () => ({
   sayGoodBye: (name: string) => `Goodbye ${name}`,
 }));
 
-describe("挨拶を返す", () => {
-  test("Hello! 名前.", () => {
-    expect(greet("John")).toBe("Hello! John.");
+describe("挨拶", () => {
+  test("greetはHello! 名前.を返す", () => {
+    expect(greet("Taro")).toBe("Hello! Taro.");
   });
-  test("Goodbye 名前", () => {
-    expect(sayGoodBye("John")).toBe("Goodbye John");
+
+  test("sayGoodByeはGoodbye 名前を返す", () => {
+    expect(sayGoodBye("Taro")).toBe("Goodbye Taro");
   });
 });
