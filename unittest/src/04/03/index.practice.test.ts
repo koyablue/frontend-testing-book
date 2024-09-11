@@ -2,33 +2,38 @@ import { getGreet } from ".";
 import * as Fetchers from "../fetchers";
 import { httpError } from "../fetchers/fixtures";
 
-jest.mock("../fetchers");
+jest.mock("../fetchers/");
 
 describe("getGreet", () => {
-  test("ユーザー名がある場合", async () => {
-    const name = "Taro";
-    jest.spyOn(Fetchers, "getMyProfile").mockResolvedValueOnce({
-      id: "abc123",
-      name,
+  test("データ取得成功", async () => {
+    const data = {
+      id: "abc",
+      name: "Taro",
+      age: 20,
       email: "example@example.com",
-    });
-    expect(getGreet()).resolves.toBe(`Hello, ${name}!`);
+    };
+    jest.spyOn(Fetchers, "getMyProfile").mockResolvedValueOnce(data);
+
+    await expect(getGreet()).resolves.toBe(`Hello, ${data.name}!`);
   });
-  test("ユーザー名がない場合", () => {
+
+  test("データ取得成功し、データのnameがない", async () => {
     jest.spyOn(Fetchers, "getMyProfile").mockResolvedValueOnce({
-      id: "abc123",
+      id: "abc",
       email: "example@example.com",
     });
 
-    expect(getGreet()).resolves.toBe("Hello, anonymous user!");
+    await expect(getGreet()).resolves.toBe("Hello, anonymous user!");
   });
 
-  test("失敗時エラーに相当するデータがthrowされる", async () => {
+  test("データ取得失敗", async () => {
     jest.spyOn(Fetchers, "getMyProfile").mockRejectedValueOnce(httpError);
+
+    expect.assertions(1);
     try {
       await getGreet();
     } catch (err) {
-      expect(err).toMatchObject(httpError);
+      expect(err).toBe(httpError);
     }
   });
 });
