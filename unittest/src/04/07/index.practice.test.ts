@@ -1,23 +1,26 @@
 import { greetByTime } from ".";
 
-describe("greetByTime", () => {
+const setUp = () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
   afterEach(() => {
     jest.useRealTimers();
   });
+};
 
-  test("時刻が12時より前のとき「おはよう」を返す", () => {
-    jest.setSystemTime(new Date("2024-08-31T11:59:00"));
+describe("greetByTime", () => {
+  setUp();
+  test("現在時刻が12時より前のとき「おはよう」", () => {
+    jest.setSystemTime(new Date("2023-01-01T11:59:59"));
     expect(greetByTime()).toBe("おはよう");
   });
-  test("時刻が12時以降で18時以前のとき「こんにちは」を返す", () => {
-    jest.setSystemTime(new Date("2024-08-31T17:59:00"));
+  test("現在時刻が12時以降かつ18時より前のとき「こんにちは」", () => {
+    jest.setSystemTime(new Date("2023-01-01T12:00:00"));
     expect(greetByTime()).toBe("こんにちは");
   });
-  test("18時以降のとき「こんばんは」を返す", () => {
-    jest.setSystemTime(new Date("2024-08-31T23:59:00"));
+  test("現在時刻が18時以降のとき「こんばんは」", () => {
+    jest.setSystemTime(new Date("2023-01-01T18:01:00"));
     expect(greetByTime()).toBe("こんばんは");
   });
 });
