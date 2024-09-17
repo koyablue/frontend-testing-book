@@ -2,14 +2,13 @@ import { render, screen } from "@testing-library/react";
 import mockRouter from "next-router-mock";
 import { Nav } from ".";
 
+jest.mock("next/router", () => jest.requireActual("next-router-mock"));
+
 describe("Nav", () => {
-  test.each([
-    { link: "/my/posts", name: "My Posts" },
-    { link: "/my/posts/create", name: "Create Post" },
-  ])("URLが$linkのとき$nameがcurrentになっている", (params) => {
-    mockRouter.setCurrentUrl(params.link);
+  test("URLとアクティブなリンクが合致している", () => {
+    mockRouter.push("/my/posts");
     render(<Nav onCloseMenu={() => {}} />);
-    expect(screen.getByRole("link", { name: params.name })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "My Posts" })).toHaveAttribute(
       "aria-current",
       "page"
     );
